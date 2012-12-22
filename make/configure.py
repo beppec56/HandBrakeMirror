@@ -791,11 +791,11 @@ class Project( Action ):
             self.build = time.strftime('%Y%m%d') + '01'
             self.title = '%s g%s (%s)' % (self.name,repo.rev,self.build)
         else:
-            self.version = '%s-g%s' % (repo.branch,repo.rev)
+            self.version = '%s-g%s x264-r2274-c832fe9' % (repo.branch,repo.rev)
             url_ctype = '_unofficial'
             url_ntype = 'unofficial'
             self.build = time.strftime('%Y%m%d') + '99'
-            self.title = '%s %s-g%s (%s)' % (self.name,repo.branch,repo.rev,self.build)
+            self.title = '%s %s-g%s (%s) x264-r2274-c832fe9' % (self.name,repo.branch,repo.rev,self.build)
 
         self.url_appcast = 'http://handbrake.fr/appcast%s%s.xml' % (url_ctype,url_arch)
         self.url_appnote = 'http://handbrake.fr/appcast/%s.html' % (url_ntype)
