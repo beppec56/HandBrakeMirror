@@ -693,7 +693,8 @@ class RepoProbe( ShellProbe ):
         except:
             pass
 
-        super( RepoProbe, self ).__init__( 'svn info', '%s info %s' % (svn,cfg.src_dir) )
+#        super( RepoProbe, self ).__init__( 'svn info', '%s info %s' % (svn,cfg.src_dir) )
+        super( RepoProbe, self ).__init__( './get-svn-info.sh', './get-svn-info.sh' )
 
         self.url       = 'svn://nowhere.com/project/unknown'
         self.root      = 'svn://nowhere.com/project'
@@ -714,12 +715,14 @@ class RepoProbe( ShellProbe ):
             (name,value) = m.groups()
             if name == 'URL':
                 self.url = value
+            elif name == 'Branch':
+                self.branch = value
             elif name == 'Repository Root':
                 self.root = value
             elif name == 'Repository UUID':
                 self.uuid = value
             elif name == 'Revision':
-                self.rev = int( value )
+                self.rev = value
             elif name == 'Last Changed Date':
                 # strip chars in parens
                 if value.find( ' (' ):
@@ -728,9 +731,9 @@ class RepoProbe( ShellProbe ):
                     self.date = value
 
         ## grok branch
-        i = self.url.rfind( '/' )
-        if i != -1 and i < len(self.url)-1:
-            self.branch = self.url[i+1:]
+#        i = self.url.rfind( '/' )
+#        if i != -1 and i < len(self.url)-1:
+#            self.branch = self.url[i+1:]
 
         # type-classification via repository UUID
         if self.uuid == 'b64f7644-9d1e-0410-96f1-a4d463321fa5':
@@ -782,17 +785,17 @@ class Project( Action ):
             self.build = time.strftime('%Y%m%d') + '00'
             self.title = '%s %s (%s)' % (self.name,self.version,self.build)
         elif repo.type == 'developer':
-            self.version = '%dsvn' % (repo.rev)
+            self.version = 'g%s' % (repo.rev)
             url_ctype = '_unstable'
             url_ntype = 'unstable'
             self.build = time.strftime('%Y%m%d') + '01'
-            self.title = '%s svn%d (%s)' % (self.name,repo.rev,self.build)
+            self.title = '%s g%s (%s)' % (self.name,repo.rev,self.build)
         else:
-            self.version = 'rev%d' % (repo.rev)
+            self.version = '%s-g%s' % (repo.branch,repo.rev)
             url_ctype = '_unofficial'
             url_ntype = 'unofficial'
             self.build = time.strftime('%Y%m%d') + '99'
-            self.title = '%s rev%d (%s)' % (self.name,repo.rev,self.build)
+            self.title = '%s %s-g%s (%s)' % (self.name,repo.branch,repo.rev,self.build)
 
         self.url_appcast = 'http://handbrake.fr/appcast%s%s.xml' % (url_ctype,url_arch)
         self.url_appnote = 'http://handbrake.fr/appcast/%s.html' % (url_ntype)
@@ -1553,7 +1556,7 @@ int main ()
     doc.add( 'HB.version.minor',  project.vminor )
     doc.add( 'HB.version.point',  project.vpoint )
     doc.add( 'HB.version',        project.version )
-    doc.add( 'HB.version.hex',    '%04x%02x%02x%08x' % (project.vmajor,project.vminor,project.vpoint,repo.rev) )
+    doc.add( 'HB.version.hex',    '%04x%02x%02x%s' % (project.vmajor,project.vminor,project.vpoint,repo.rev) )
 
     doc.add( 'HB.build', project.build )
 
