@@ -9,11 +9,14 @@ fi
 
 cd x264
 
+git checkout master
+git pull
+
 #git  pull origin +master:master
 if [ "$1" != "" ]; then
     git checkout $1
 else # use curent default
-    git checkout 9c4ba4b
+    git checkout bc13772
 fi
 
 TARFILE=`./version.sh | grep X264_VERSION |awk '{print "x264-"$4"-"$5".tar.gz"}' | sed 's/\"//g'`
